@@ -51,15 +51,3 @@ Card[] cardList() {
     }
     return cardList;
 }
-
-
-void rectGrid(int rows, int cols, int rectSizeX, int rectSizeY, int spacing) {
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-    rectMode(CENTER);
-      int x = j * (rectSizeX + spacing) + spacing;
-      int y = i * (rectSizeY + spacing) + spacing;
-      rect(x, y, rectSizeX, rectSizeY);
-    }
-  }
-}
