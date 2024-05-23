@@ -28,7 +28,7 @@ public class Card {
     void square(float x, float y, float size) {
         rectMode(CENTER);
         stroke(this.hue);
-        strokeWeight(8);
+        strokeWeight(6);
         if (shading == 0) {
             noFill();
             rect(x, y, size / 2, size / 2);
@@ -37,7 +37,7 @@ public class Card {
             noFill();
             line(x, y - size / 2 , x , y + size / 2);
             line(x - size / 2, y, x + size / 2, y);
-            rect(x, y, size / 2, size / 2);
+            rect(x, y, size, size);
         }
         if (shading == 2) {
             fill(this.hue);
@@ -47,13 +47,13 @@ public class Card {
 
     void circle(float x, float y, float size) {
         stroke(this.hue);
-        strokeWeight(8);
+        strokeWeight(6);
         if (shading == 0) {
             noFill();
             circle(x, y, size);
         } 
         if (shading == 1) {
-            line(x, y - size / 2 , x , y + size / 2);
+            
             noFill();
             line(x - size / 2, y, x + size / 2, y);
             circle(x, y, size);
@@ -66,7 +66,7 @@ public class Card {
 
     void rhombus(float x, float y, float size) {
         stroke(this.hue);
-        strokeWeight(8);
+        strokeWeight(6);
         if (shading == 0) {
             noFill();
             beginShape();
@@ -99,28 +99,35 @@ public class Card {
     }
 
     void cardDrawer(float x, float y, float sizeX) {
+        
         if (number == 1) {
             if (shape == 0) {
+
                 square(x, y, sizeX / 2);
             }
             if (shape == 1) {
+              
                 circle(x, y, sizeX / 2);
             }
             if (shape == 2) {
+             
                 rhombus(x, y, sizeX / 2);
             }
         }
 
         if (number == 2) {
             if (shape == 0) {
+                
                 square(x-sizeX/2.5, y, sizeX / 3);
                 square(x+sizeX/2.5, y, sizeX / 3);
             }
             if (shape == 1) {
+                
                circle(x-sizeX/2.5, y, sizeX / 3);
                circle(x+sizeX/2.5, y, sizeX / 3);
             }
             if (shape == 2) {
+              
                 rhombus(x-sizeX/2.5, y, sizeX / 3);
                 rhombus(x+sizeX/2.5, y, sizeX / 3);
             }
@@ -128,16 +135,19 @@ public class Card {
 
         if (number == 3) {
             if (shape == 0) {
+              
                 square(x-sizeX/1.66, y, sizeX / 4);
                 square(x, y, sizeX / 4);
                 square(x+sizeX/1.66, y, sizeX / 4);
             }
             if (shape == 1) {
+              
                 circle(x-sizeX/1.66, y, sizeX / 4);
                 circle(x, y, sizeX / 4);
                 circle(x+sizeX/1.66, y, sizeX / 4);
             }
             if (shape == 2) {
+              
                 rhombus(x-sizeX/1.66, y, sizeX / 4);
                 rhombus(x, y, sizeX / 4);
                 rhombus(x+sizeX/1.66, y, sizeX / 4);
