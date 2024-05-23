@@ -9,4 +9,6 @@ public class Card {
         this.shading = shading;
         this.number = number;
     }
+
+    
 }
