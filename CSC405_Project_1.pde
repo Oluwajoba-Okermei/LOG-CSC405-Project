@@ -2,17 +2,18 @@ void setup(){
  System.out.println("Hello world");
  Card[] cardList = cardList();
  for(int i = 0; i < cardList.length; i++) {
-   System.out.println(27 * cardList[i].shape + 9 * cardList[i].hue + 3 * cardList[i].shading + cardList[i].number);
+   System.out.println(27 * cardList[i].shape + 9 * cardList[i].hueInt + 3 * cardList[i].shading + cardList[i].number);
  //cardList[0].cardDrawer(width/2,height/2,100);
  }
 }
 
-PVector[] centers = new PVector[12];
+
 
 public void centers(int cols, int rows) {
+  PVector[] centers = new PVector[12];
 for (int i =0; i<centers.length; i++) {
     int n = 1;
-    centers[i] = PVector((width/cols)*n,(height/rows)*n);
+    centers[i] = new PVector(1.0*(width/cols)*n,1.0*(height/rows)*n);
     n++;
 }
 }
@@ -25,6 +26,7 @@ void draw() {
 
 Card[] cardList() {
     int[] cardIndexList = new int[81];
+    Card[] cardList = new Card[81];
 
     for(int i = 0; i < cardIndexList.length; i++) {
         cardIndexList[i] = i;
@@ -50,8 +52,6 @@ Card[] cardList() {
         int shape = cardNumber % 3;
 
         cardList[i] = new Card(shape, hue, shading, number);
+    }
     return cardList;
 }
-}
-
-
