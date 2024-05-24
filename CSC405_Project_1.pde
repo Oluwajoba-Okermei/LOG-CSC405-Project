@@ -52,5 +52,6 @@ Card[] cardList() {
         cardList[i] = new Card(shape, hue, shading, number);
     return cardList;
 }
+}
 
 
