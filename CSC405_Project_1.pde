@@ -38,8 +38,18 @@ Card[] cardList() {
         cardIndexList[index] = temp;
     }
 
-    Card[] cardList = new Card[81];number);
-    }
+    for (int i = 0; i < cardIndexList.length; i++) {
+        int cardNumber = cardIndexList[i];
+
+        int number = cardNumber % 3;
+        cardNumber = cardNumber / 3;
+        int shading = cardNumber % 3;
+        cardNumber = cardNumber / 3;
+        int hue = cardNumber % 3;
+        cardNumber = cardNumber / 3;
+        int shape = cardNumber % 3;
+
+        cardList[i] = new Card(shape, hue, shading, number);
     return cardList;
 }
 
