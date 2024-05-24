@@ -14,7 +14,7 @@ public class Card {
             hue = color(135, 44, 40);
         }
         if (hueInt == 1) {
-            hue = color(70,155,19);
+            hue = color(16, 22, 53);
         }
         if (hueInt == 2) {
             hue = color(63, 171, 217);
