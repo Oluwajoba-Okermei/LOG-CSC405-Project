@@ -1,15 +1,137 @@
 Card[] cardList = cardList();
+Card[] onScreen = new Card[21];
+int[] selectedCards = new int[3];
+int[] takenCards = new int[81];
+boolean mouseReleased;
+
 
 void setup() {
-  size(640,480);
+  size(640, 480);
   System.out.println("Hello world");
   for (int i = 0; i < cardList.length; i++) {
     System.out.println(27 * cardList[i].shape + 9 * cardList[i].hueInt + 3 * cardList[i].shading + cardList[i].number);
     //cardList[0].cardDrawer(width/2,height/2,100);
   }
-   drawGrid(3, 4);
+  System.out.println(onScreen[1]);
+  for (int i = 0; i < 12; i++) {
+    onScreen[i] = cardList[i];
+    takenCards[i] = i;
+  }
+  mouseReleased = false;
+  
+  for (int i = 0; i < selectedCards.length; i++) {
+    selectedCards[i] = -1;
+  }
+  for (int i = 12; i < takenCards.length; i++) {
+    takenCards[i] = -1;
+  }
 }
 
+void mouseReleased() {
+  mouseReleased = true;
+}
+
+void draw() {
+  background(255);
+  updateOnScreen();
+  cardGrid(3, countOnScreen()/3);
+  drawGrid(countOnScreen()/3, 3);
+  if (mouseReleased) {
+    selectedCards[countSelected()] = closestCenter(mouseX, mouseY, 3, countOnScreen()/3);
+    mouseReleased = false;
+  }
+  if (countSelected() == 3) {
+    Card[] chosenCards = new Card[3];
+    for (int i = 0; i < 3; i++) {
+      chosenCards[i] = onScreen[selectedCards[i]];
+    }
+    if (setCheck(chosenCards)) {
+      System.out.println("This is a set!");
+      int firstNotTaken = 0;
+      for (int i = 0; i < selectedCards.length; i++) {
+        firstNotTaken = firstNotTaken();
+        onScreen[selectedCards[i]] = cardList[firstNotTaken];
+        takenCards[firstNotTaken] = firstNotTaken;
+        
+      }
+    } else {
+      System.out.println("Not a set");
+    }
+    for (int i = 0; i < selectedCards.length; i++) {
+      selectedCards[i] = -1;
+    }
+  }
+}
+
+public int countOnScreen() {
+  int counter = 0;
+  for (int i = 0; i < onScreen.length; i++ ) {
+    if (onScreen[i] != null) {
+      counter++;
+    }
+  }
+  return counter;
+}
+
+public int countSelected() {
+  int counter = 0;
+  for (int i = 0; i < selectedCards.length; i++ ) {
+    if (selectedCards[i] != -1) {
+      counter++;
+    }
+  }
+  return counter;
+}
+
+public Card[] realOnScreen() {
+  Card[] realOnScreen = new Card[countOnScreen()];
+  int j = 0;
+  for (int i = 0; i < realOnScreen.length; i++) {
+    if (onScreen[i] != null) {
+      realOnScreen[j] = onScreen[i];
+      j++;
+    }
+  }
+  return realOnScreen;
+}
+
+
+public void updateOnScreen() {
+  boolean isSet = setCheck(realOnScreen());
+  if (isSet) {
+    return;
+  }
+  else {
+    int idx = countOnScreen();
+    System.out.println(idx);
+    onScreen[idx] = cardList[firstNotTaken()];
+    takenCards[firstNotTaken()] = firstNotTaken();
+    onScreen[idx + 1] = cardList[firstNotTaken()];
+    takenCards[firstNotTaken()] = firstNotTaken();
+    onScreen[idx + 2] = cardList[firstNotTaken()];
+    takenCards[firstNotTaken()] = firstNotTaken();
+    updateOnScreen();
+  }
+
+}
+
+
+boolean isTaken(int i) {
+  for (int j = 0; j < takenCards.length; j++) {
+    if (i == takenCards[j]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+int firstNotTaken() {
+  int i = 0;
+  while (isTaken(i)) {
+    i++;
+  }
+  return i;
+}
 
 
 public PVector[] centers(int cols, int rows) {
@@ -21,33 +143,45 @@ public PVector[] centers(int cols, int rows) {
   }
   return centers;
 }
-public void cardGrid(int cols, int rows) {
-    PVector[] centers = centers(cols, rows);
-    for (int i = 0; i<centers.length; i++) {
-      cardList[i].cardDrawer(centers[i], 100);
+
+int closestCenter(int x, int y, int cols, int rows) {
+  PVector[] centers = centers(cols, rows);
+  float closestDist = width * width + height * height;
+  int closestIdx = 0;
+  for (int i = 0; i < centers.length; i++) {
+    float d = (centers[i].x - x) * (centers[i].x - x) + (centers[i].y - y) * (centers[i].y - y);
+    if (d < closestDist) {
+      closestDist = d;
+      closestIdx = i;
     }
+  }
+  return closestIdx;
 }
 
-void draw() {
-  cardGrid(3,4);
+public void cardGrid(int cols, int rows) {
+  PVector[] centers = centers(cols, rows);
+  for (int i = 0; i<centers.length; i++) {
+    onScreen[i].cardDrawer(centers[i], 100);
   }
+}
 
-  boolean setCheck(Card[] cardGroup) {
-    for (int i = 0; i < cardGroup.length - 2; i++) {
-      for (int j = i +1; j < cardGroup.length - 1; j++) {
-        for (int k = j +1; j < cardGroup.length; j++) {
-          if ((cardGroup[i].number + cardGroup[j].number + cardGroup[k].number % 3 == 0)
-            &&  (cardGroup[i].shape + cardGroup[j].shape + cardGroup[k].shape % 3 == 0)
-            &&  (cardGroup[i].shading + cardGroup[j].shading + cardGroup[k].shading % 3 == 0)
-            &&  (cardGroup[i].hueInt + cardGroup[j].hueInt + cardGroup[k].hueInt % 3 == 0)
-            ) {
-            return true;
-          }
+
+boolean setCheck(Card[] cardGroup) {
+  for (int i = 0; i < cardGroup.length - 2; i++) {
+    for (int j = i + 1; j < cardGroup.length - 1; j++) {
+      for (int k = j + 1; j < cardGroup.length; j++) {
+        if (((cardGroup[i].number + cardGroup[j].number + cardGroup[k].number) % 3 == 0)
+          &&  ((cardGroup[i].shape + cardGroup[j].shape + cardGroup[k].shape) % 3 == 0)
+          &&  ((cardGroup[i].shading + cardGroup[j].shading + cardGroup[k].shading) % 3 == 0)
+          &&  ((cardGroup[i].hueInt + cardGroup[j].hueInt + cardGroup[k].hueInt) % 3 == 0)
+          ) {
+          return true;
         }
       }
     }
-    return false;
   }
+  return false;
+}
 
 Card[] cardList() {
   int[] cardIndexList = new int[81];
@@ -79,46 +213,20 @@ Card[] cardList() {
     cardList[i] = new Card(shape, hue, shading, number);
   }
   return cardList;
+}
 
-  //void drawGrid(int rows, int cols, int spacing) {
-  //  background(255);
-  //  stroke(0);
-  //  for (int i = 0; i < rows; i++) {
-  //    for (int j = 0; j < cols; j++) {
-  //      int x = j * spacing;
-  //      int y = i * spacing;
-  //      rect(x, y, spacing, spacing);
-  //    }
-  //  }
-  //}
-
-//  void drawGrid(int rows, int cols) {
-//  float canvasWidth = width;
-//  float canvasHeight = height;
-  
-//  float spacing = 10; // Spacing between rectangles and edges
-  
-//  float rectWidth = (canvasWidth - (cols + 1) * spacing) / cols;
-//  float rectHeight = (canvasHeight - (rows + 1) * spacing) / rows;
-  
-//  for (int i = 0; i < rows; i++) {
-//    for (int j = 0; j < cols; j++) {
-//      float x = j * (rectWidth + spacing) + spacing;
-//      float y = i * (rectHeight + spacing) + spacing;
-//      rect(x, y, rectWidth, rectHeight);
-//    }
-//  }
-//}
 
 void drawGrid(int rows, int cols) {
+  rectMode(CORNER);
   float canvasWidth = width;
   float canvasHeight = height;
-  
+  stroke(0);
+  noFill();
   float spacing = 10; // Spacing between rectangles and edges
-  
+
   float rectWidth = (canvasWidth - (cols + 1) * spacing) / cols;
   float rectHeight = (canvasHeight - (rows + 1) * spacing) / rows;
-  
+
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
       float x = j * (rectWidth + spacing) + spacing;
@@ -126,7 +234,4 @@ void drawGrid(int rows, int cols) {
       rect(x, y, rectWidth, rectHeight);
     }
   }
-}
-
-
 }
