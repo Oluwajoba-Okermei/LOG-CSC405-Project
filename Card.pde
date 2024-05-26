@@ -22,7 +22,9 @@ public class Card {
     }
     
     
-    
+    int cardID() {
+      return 27 * this.shape + 9 * this.hueInt + 3 * this.shading + this.number - 1;
+    }
 
     
     void squareCard(PVector location, float size) {

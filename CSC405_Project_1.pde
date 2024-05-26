@@ -1,18 +1,23 @@
 Card[] cardList = cardList();
-Card[] onScreen = new Card[21];
+Card[] onScreen = new Card[30];
 int[] selectedCards = new int[3];
 int[] takenCards = new int[81];
 boolean mouseReleased;
+int score = 0;
+int time = 0;
 
 
 void setup() {
   size(640, 480);
-  System.out.println("Hello world");
-  for (int i = 0; i < cardList.length; i++) {
-    System.out.println(27 * cardList[i].shape + 9 * cardList[i].hueInt + 3 * cardList[i].shading + cardList[i].number);
-    //cardList[0].cardDrawer(width/2,height/2,100);
-  }
-  System.out.println(onScreen[1]);
+  //System.out.println("Hello world");
+  //int counter = 0;
+  //for (int i = 0; i < cardList.length; i++) {
+  //  counter++;
+  //  System.out.println(27 * cardList[i].shape + 9 * cardList[i].hueInt + 3 * cardList[i].shading + cardList[i].number - 1);
+  //  //cardList[0].cardDrawer(width/2,height/2,100);
+  //}
+  //System.out.println(counter);
+  //System.out.println(onScreen[1]);
   for (int i = 0; i < 12; i++) {
     onScreen[i] = cardList[i];
     takenCards[i] = i;
@@ -31,13 +36,43 @@ void mouseReleased() {
   mouseReleased = true;
 }
 
+boolean endGame() {
+  for (int i = 0; i < 81; i++) {
+    if (!isTaken(i)) {
+      return false;    
+    }
+  }
+  if (setCheck(realOnScreen())) {
+    return false;
+  }
+  return true;
+}
+
 void draw() {
+  if (endGame()) {
+    fill(255);
+    textSize(128);
+    text("You Win! Time: " + time/60 + "seconds", 100, 100, width - 100, height - 100);
+    return;    
+  }
+  
+  time ++;
   background(255);
   updateOnScreen();
   cardGrid(3, countOnScreen()/3);
   drawGrid(countOnScreen()/3, 3);
   if (mouseReleased) {
-    selectedCards[countSelected()] = closestCenter(mouseX, mouseY, 3, countOnScreen()/3);
+    int closestCenter = closestCenter(mouseX, mouseY, 3, countOnScreen()/3);
+    boolean isChosenTwice = false;
+    for (int i = 0; i < 3; i++) {
+      if (closestCenter == selectedCards[i]) {
+        System.out.println("No choosing the same card twice");
+        isChosenTwice = true;
+      }  
+    }
+    if (!isChosenTwice) {
+      selectedCards[countSelected()] = closestCenter;
+    }
     mouseReleased = false;
   }
   if (countSelected() == 3) {
@@ -46,14 +81,35 @@ void draw() {
       chosenCards[i] = onScreen[selectedCards[i]];
     }
     if (setCheck(chosenCards)) {
-      System.out.println("This is a set!");
-      int firstNotTaken = 0;
-      for (int i = 0; i < selectedCards.length; i++) {
-        firstNotTaken = firstNotTaken();
-        onScreen[selectedCards[i]] = cardList[firstNotTaken];
-        takenCards[firstNotTaken] = firstNotTaken;
-        
+      score++;
+      if (score == 1) {
+        System.out.println("1 set found!");
+      } else {
+        System.out.println(score + " sets found!");
       }
+
+      int firstNotTaken = 0;
+      if (countOnScreen() == 12) {
+        for (int i = 0; i < selectedCards.length; i++) {
+          firstNotTaken = firstNotTaken();
+          onScreen[selectedCards[i]] = cardList[firstNotTaken];
+          takenCards[firstNotTaken] = firstNotTaken;
+        } 
+      } else {
+        for (int i = 0; i < selectedCards.length; i++) {
+          onScreen[selectedCards[i]] = null;
+        }
+
+        Card[] realOnScreen = realOnScreen();
+        
+        for (int i = 0; i < onScreen.length; i++) {
+          onScreen[i] = null;
+        }
+        for (int i = 0; i < realOnScreen.length; i++) {
+          onScreen[i] = realOnScreen[i];      
+        }
+      }
+        
     } else {
       System.out.println("Not a set");
     }
@@ -103,7 +159,6 @@ public void updateOnScreen() {
   }
   else {
     int idx = countOnScreen();
-    System.out.println(idx);
     onScreen[idx] = cardList[firstNotTaken()];
     takenCards[firstNotTaken()] = firstNotTaken();
     onScreen[idx + 1] = cardList[firstNotTaken()];
