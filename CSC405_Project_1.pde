@@ -5,6 +5,7 @@ int[] takenCards = new int[81];
 boolean mouseReleased;
 int score = 0;
 int time = 0;
+boolean gameHasntStarted = true;
 
 
 void setup() {
@@ -37,30 +38,42 @@ void mouseReleased() {
 }
 
 boolean endGame() {
-  for (int i = 0; i < 81; i++) {
-    if (!isTaken(i)) {
-      return false;    
-    }
-  }
-  if (setCheck(realOnScreen())) {
-    return false;
-  }
-  return true;
+  return ((firstNotTaken() >= 81) && (! setCheck(realOnScreen())));
 }
 
 void draw() {
+  if (gameHasntStarted) {
+    background(255);
+    fill(0);
+    textSize(60);
+    String s = "Welcome! Click the s key for a normal game of set or h for hard mode!";
+    text(s, 100, 75, width - 100, height - 100);
+    if (keyPressed) {
+      if (key == 'h' || key == 'H') {
+        gameHasntStarted = false;
+      }
+      if (key == 's' || key == 'S') {
+        gameHasntStarted = false;
+      }
+    }
+    return;
+  }
+  
   if (endGame()) {
-    fill(255);
-    textSize(128);
-    text("You Win! Time: " + time/60 + "seconds", 100, 100, width - 100, height - 100);
-    return;    
+    background(255);
+    fill(0);
+    textSize(100);
+    String s = "You Win! Time: " + time/60 + " seconds";
+    text(s, 125, 75, width - 100, height - 100);
+    return;       
   }
   
   time ++;
   background(255);
   updateOnScreen();
-  cardGrid(3, countOnScreen()/3);
   drawGrid(countOnScreen()/3, 3);
+  cardGrid(3, countOnScreen()/3);
+  
   if (mouseReleased) {
     int closestCenter = closestCenter(mouseX, mouseY, 3, countOnScreen()/3);
     boolean isChosenTwice = false;
@@ -89,7 +102,7 @@ void draw() {
       }
 
       int firstNotTaken = 0;
-      if (countOnScreen() == 12) {
+      if ((countOnScreen() == 12) && (firstNotTaken() <= 80)) {
         for (int i = 0; i < selectedCards.length; i++) {
           firstNotTaken = firstNotTaken();
           onScreen[selectedCards[i]] = cardList[firstNotTaken];
@@ -108,8 +121,9 @@ void draw() {
         for (int i = 0; i < realOnScreen.length; i++) {
           onScreen[i] = realOnScreen[i];      
         }
-      }
         
+      }
+      setPrint(realOnScreen());  
     } else {
       System.out.println("Not a set");
     }
@@ -224,18 +238,39 @@ public void cardGrid(int cols, int rows) {
 boolean setCheck(Card[] cardGroup) {
   for (int i = 0; i < cardGroup.length - 2; i++) {
     for (int j = i + 1; j < cardGroup.length - 1; j++) {
-      for (int k = j + 1; j < cardGroup.length; j++) {
+      for (int k = j + 1; k < cardGroup.length; k++) {
         if (((cardGroup[i].number + cardGroup[j].number + cardGroup[k].number) % 3 == 0)
           &&  ((cardGroup[i].shape + cardGroup[j].shape + cardGroup[k].shape) % 3 == 0)
           &&  ((cardGroup[i].shading + cardGroup[j].shading + cardGroup[k].shading) % 3 == 0)
           &&  ((cardGroup[i].hueInt + cardGroup[j].hueInt + cardGroup[k].hueInt) % 3 == 0)
           ) {
+
+            
           return true;
         }
       }
     }
   }
   return false;
+}
+
+
+void setPrint(Card[] cardGroup) {
+  for (int i = 0; i < cardGroup.length - 2; i++) {
+    for (int j = i + 1; j < cardGroup.length - 1; j++) {
+      for (int k = j + 1; k < cardGroup.length; k++) {
+        if (((cardGroup[i].number + cardGroup[j].number + cardGroup[k].number) % 3 == 0)
+          &&  ((cardGroup[i].shape + cardGroup[j].shape + cardGroup[k].shape) % 3 == 0)
+          &&  ((cardGroup[i].shading + cardGroup[j].shading + cardGroup[k].shading) % 3 == 0)
+          &&  ((cardGroup[i].hueInt + cardGroup[j].hueInt + cardGroup[k].hueInt) % 3 == 0)
+          ) {
+            System.out.println(i + ", " + j + ", " + k);
+            return;
+            
+        }
+      }
+    }
+  }
 }
 
 Card[] cardList() {
@@ -269,6 +304,8 @@ Card[] cardList() {
   }
   return cardList;
 }
+
+
 
 
 void drawGrid(int rows, int cols) {
