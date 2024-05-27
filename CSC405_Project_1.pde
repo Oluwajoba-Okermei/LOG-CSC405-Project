@@ -13,6 +13,8 @@ int score = 0;
 int time = 0;
 boolean gameHasntStarted = true;
 int colorCounter = 0;
+boolean hardMode = false;
+int hardModeTime = 0;
 
 
 void setup() {
@@ -31,12 +33,22 @@ void setup() {
     takenCards[i] = i;
   }
   mouseReleased = false;
-  
+
   for (int i = 0; i < selectedCards.length; i++) {
     selectedCards[i] = -1;
   }
   for (int i = 12; i < takenCards.length; i++) {
     takenCards[i] = -1;
+  }
+}
+
+void keyPressed() {
+  if (key == 'h' || key == 'H') {
+    gameHasntStarted = false;
+    hardMode = true;
+  }
+  if (key == 's' || key == 'S') {
+    gameHasntStarted = false;
   }
 }
 
@@ -55,26 +67,18 @@ void draw() {
     textSize(60);
     String s = "Welcome! Click the s key for a normal game of set or h for hard mode!";
     text(s, 100, 75, width - 100, height - 100);
-    if (keyPressed) {
-      if (key == 'h' || key == 'H') {
-        gameHasntStarted = false;
-      }
-      if (key == 's' || key == 'S') {
-        gameHasntStarted = false;
-      }
-    }
     return;
   }
-  
+
   if (endGame()) {
     background(255);
     fill(0);
     textSize(100);
     String s = "You Win! Time: " + time/60 + " seconds";
     text(s, 125, 75, width - 100, height - 100);
-    return;       
+    return;
   }
-  
+
   time ++;
   colorCounter ++;
   if (colorCounter > 25 * 255) {
@@ -85,7 +89,7 @@ void draw() {
   drawGrid(countOnScreen()/3, 3);
   for (int i = 0; i < selectedCards.length; i++) {
     if (selectedCards[i] != -1) {
-      color lightblue = color(215,215, 255);
+      color lightblue = color(215, 215, 255);
       shadeRect(selectedCards[i], 3, countOnScreen()/3, lightblue);
     }
   }
@@ -110,12 +114,33 @@ void draw() {
     noSetTime = 0;
     noSetColor = false;
   }
-  
-  
   cardGrid(3, countOnScreen()/3);
 
-  
-  
+  if (hardMode) {
+    if (hardModeTime >= 60 * 15) {
+      hardModeTime = 0;
+      colorCounter = 0;
+      cardList = cardList();
+      for (int i = 0; i < onScreen.length; i++) {
+        onScreen[i] = null;
+      }
+      for (int i = 0; i < 12; i++) {
+        onScreen[i] = cardList[i];
+        takenCards[i] = i;
+      }
+      mouseReleased = false;
+
+      for (int i = 0; i < selectedCards.length; i++) {
+        selectedCards[i] = -1;
+      }
+      for (int i = 12; i < takenCards.length; i++) {
+        takenCards[i] = -1;
+      }
+    }
+
+    hardModeTime ++;
+  }
+
   if (mouseReleased) {
     int closestCenter = closestCenter(mouseX, mouseY, 3, countOnScreen()/3);
     boolean isChosenTwice = false;
@@ -123,7 +148,7 @@ void draw() {
       if (closestCenter == selectedCards[i]) {
         System.out.println("No choosing the same card twice");
         isChosenTwice = true;
-      }  
+      }
     }
     if (!isChosenTwice) {
       selectedCards[countSelected()] = closestCenter;
@@ -137,6 +162,7 @@ void draw() {
     }
     if (setCheck(chosenCards)) {
       score++;
+      hardModeTime = 0;
       colorCounter = 0;
       if (score == 1) {
         System.out.println("1 set found!");
@@ -150,21 +176,20 @@ void draw() {
           firstNotTaken = firstNotTaken();
           onScreen[selectedCards[i]] = cardList[firstNotTaken];
           takenCards[firstNotTaken] = firstNotTaken;
-        } 
+        }
       } else {
         for (int i = 0; i < selectedCards.length; i++) {
           onScreen[selectedCards[i]] = null;
         }
 
         Card[] realOnScreen = realOnScreen();
-        
+
         for (int i = 0; i < onScreen.length; i++) {
           onScreen[i] = null;
         }
         for (int i = 0; i < realOnScreen.length; i++) {
-          onScreen[i] = realOnScreen[i];      
+          onScreen[i] = realOnScreen[i];
         }
-        
       }
       setColor = true;
       setTime = 0;
@@ -172,7 +197,6 @@ void draw() {
         completeSet[i] = selectedCards[i];
       }
       setPrint(realOnScreen());
-      
     } else {
       System.out.println("Not a set");
       noSetColor = true;
@@ -224,8 +248,7 @@ public void updateOnScreen() {
   boolean isSet = setCheck(realOnScreen());
   if (isSet) {
     return;
-  }
-  else {
+  } else {
     int idx = countOnScreen();
     onScreen[idx] = cardList[firstNotTaken()];
     takenCards[firstNotTaken()] = firstNotTaken();
@@ -235,7 +258,6 @@ public void updateOnScreen() {
     takenCards[firstNotTaken()] = firstNotTaken();
     updateOnScreen();
   }
-
 }
 
 
@@ -299,7 +321,7 @@ boolean setCheck(Card[] cardGroup) {
           &&  ((cardGroup[i].hueInt + cardGroup[j].hueInt + cardGroup[k].hueInt) % 3 == 0)
           ) {
 
-            
+
           return true;
         }
       }
@@ -318,9 +340,8 @@ void setPrint(Card[] cardGroup) {
           &&  ((cardGroup[i].shading + cardGroup[j].shading + cardGroup[k].shading) % 3 == 0)
           &&  ((cardGroup[i].hueInt + cardGroup[j].hueInt + cardGroup[k].hueInt) % 3 == 0)
           ) {
-            System.out.println(i + ", " + j + ", " + k);
-            return;
-            
+          System.out.println(i + ", " + j + ", " + k);
+          return;
         }
       }
     }
@@ -369,7 +390,7 @@ void shadeRect(int center, int cols, int rows, color c) {
   stroke(0);
   fill(c);
   float spacing = 10; // Spacing between rectangles and edges
-  
+
   float rectWidth = (canvasWidth - (cols + 1) * spacing) / cols;
   float rectHeight = (canvasHeight - (rows + 1) * spacing) / rows;
 
@@ -377,7 +398,6 @@ void shadeRect(int center, int cols, int rows, color c) {
   float y = centerY * (rectHeight + spacing) + spacing;
   rect(x, y, rectWidth, rectHeight);
   noFill();
-
 }
 
 
@@ -405,4 +425,3 @@ void drawGrid(int rows, int cols) {
   color lightgrey = color(220);
   shadeRect(closestCenter, cols, rows, lightgrey);
 }
-
