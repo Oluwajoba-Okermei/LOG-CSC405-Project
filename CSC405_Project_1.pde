@@ -405,3 +405,4 @@ void drawGrid(int rows, int cols) {
   color lightgrey = color(220);
   shadeRect(closestCenter, cols, rows, lightgrey);
 }
+
