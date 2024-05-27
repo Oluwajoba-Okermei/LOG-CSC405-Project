@@ -1,18 +1,11 @@
 Card[] cardList = cardList();
-Card[] onScreen = new Card[21];
+Card[] onScreen = new Card[30];
 int[] selectedCards = new int[3];
 int[] takenCards = new int[81];
-int[] completeSet = new int[3];
-int[] failedSet = new int[3];
 boolean mouseReleased;
-boolean noSetColor = false;
-int noSetTime = 0;
-boolean setColor = false;
-int setTime = 0;
 int score = 0;
 int time = 0;
 boolean gameHasntStarted = true;
-int colorCounter = 0;
 
 
 void setup() {
@@ -76,45 +69,10 @@ void draw() {
   }
   
   time ++;
-  colorCounter ++;
-  if (colorCounter > 25 * 255) {
-    colorCounter = 0;
-  }
-  background(255, 255 - colorCounter * 0.03, 255-(colorCounter * 0.04));
+  background(255);
   updateOnScreen();
   drawGrid(countOnScreen()/3, 3);
-  for (int i = 0; i < selectedCards.length; i++) {
-    if (selectedCards[i] != -1) {
-      color lightblue = color(215,215, 255);
-      shadeRect(selectedCards[i], 3, countOnScreen()/3, lightblue);
-    }
-  }
-  if (setColor && setTime < 30) {
-    color lightgreen = color(200, 255, 200);
-    for (int i = 0; i < 3; i++) {
-      shadeRect(completeSet[i], 3, countOnScreen()/3, lightgreen);
-    }
-    setTime ++;
-  } else {
-    setTime = 0;
-    setColor = false;
-  }
-
-  if (noSetColor && (noSetTime < 30)) {
-    color lightred = color(255, 200, 200);
-    for (int i = 0; i < 3; i++) {
-      shadeRect(failedSet[i], 3, countOnScreen()/3, lightred);
-    }
-    noSetTime ++;
-  } else {
-    noSetTime = 0;
-    noSetColor = false;
-  }
-  
-  
   cardGrid(3, countOnScreen()/3);
-
-  
   
   if (mouseReleased) {
     int closestCenter = closestCenter(mouseX, mouseY, 3, countOnScreen()/3);
@@ -137,7 +95,6 @@ void draw() {
     }
     if (setCheck(chosenCards)) {
       score++;
-      colorCounter = 0;
       if (score == 1) {
         System.out.println("1 set found!");
       } else {
@@ -166,20 +123,9 @@ void draw() {
         }
         
       }
-      setColor = true;
-      setTime = 0;
-      for (int i = 0; i < 3; i++) {
-        completeSet[i] = selectedCards[i];
-      }
-      setPrint(realOnScreen());
-      
+      setPrint(realOnScreen());  
     } else {
       System.out.println("Not a set");
-      noSetColor = true;
-      noSetTime = 0;
-      for (int i = 0; i < 3; i++) {
-        failedSet[i] = selectedCards[i];
-      }
     }
     for (int i = 0; i < selectedCards.length; i++) {
       selectedCards[i] = -1;
@@ -369,10 +315,10 @@ void shadeRect(int center, int cols, int rows, color c) {
   stroke(0);
   fill(c);
   float spacing = 10; // Spacing between rectangles and edges
-  
+
   float rectWidth = (canvasWidth - (cols + 1) * spacing) / cols;
   float rectHeight = (canvasHeight - (rows + 1) * spacing) / rows;
-
+  
   float x = centerX * (rectWidth + spacing) + spacing;
   float y = centerY * (rectHeight + spacing) + spacing;
   rect(x, y, rectWidth, rectHeight);
