@@ -74,9 +74,8 @@ void draw() {
     background(255);
     fill(0);
     textSize(100);
-    String s = "You Win! Time: " + time/60 + " seconds";
-    text(s, 125, 75, width - 100, height - 100);
-    return;
+    System.out.println("You Win! Time: " + time/60 + " seconds");
+    exit();
   }
 
   time ++;
@@ -196,7 +195,6 @@ void draw() {
       for (int i = 0; i < 3; i++) {
         completeSet[i] = selectedCards[i];
       }
-      setPrint(realOnScreen());
     } else {
       System.out.println("Not a set");
       noSetColor = true;
