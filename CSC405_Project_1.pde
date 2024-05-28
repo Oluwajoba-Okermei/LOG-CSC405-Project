@@ -81,7 +81,7 @@ void draw() {
 
   time ++;
   colorCounter ++;
-  if (colorCounter > 25 * 255) {
+  if (colorCounter > 15 * 255) {
     colorCounter = 0;
   }
   background(255, 255 - colorCounter * 0.03, 255-(colorCounter * 0.04));
