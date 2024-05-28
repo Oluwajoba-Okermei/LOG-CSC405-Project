@@ -246,6 +246,8 @@ public void updateOnScreen() {
   boolean isSet = setCheck(realOnScreen());
   if (isSet) {
     return;
+  } else if (firstNotTaken() >= 80) {
+    return;
   } else {
     int idx = countOnScreen();
     onScreen[idx] = cardList[firstNotTaken()];
